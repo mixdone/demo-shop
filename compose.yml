@@ -1,0 +1,95 @@
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./site:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php-app
+  
+  php-app:
+    build:
+      context: .
+    environment:
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+    volumes:
+      - ./site:/var/www/html
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      minio-s3:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+  
+  mysql-db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init-mysql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+  
+  minio-s3:
+    image: minio/minio:latest
+    restart: always
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+        start_period: 5s
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio-s3:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+      MINIO_USER: "${MINIO_USER}"
+      MINIO_PASSWORD: "${MINIO_PASSWORD}"
+    volumes:
+      - ./shop-assets:/shop-assets
+    entrypoint: >
+      /bin/sh -c "
+        /usr/bin/mc alias set minio-s3 http://minio-s3:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD};
+        /usr/bin/mc admin user add minio-s3 $${MINIO_USER} $${MINIO_PASSWORD};
+        /usr/bin/mc admin policy attach minio-s3 readwrite --user=$${MINIO_USER};
+
+        /usr/bin/mc mb minio-s3/shop-products;
+        /usr/bin/mc anonymous set download minio-s3/shop-products;
+
+        /usr/bin/mc mirror /shop-assets minio-s3/shop-products;
+        exit 0;
+      "
+
+volumes:
+  mysql-data:
+  minio-data:
