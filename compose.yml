@@ -17,7 +17,7 @@ services:
       MYSQL_USER: "${MYSQL_USER}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
     volumes:
-      - ./site:/var/www/html
+      - ./site/core:/var/www/html/core
     depends_on:
       mysql-db:
         condition: service_healthy

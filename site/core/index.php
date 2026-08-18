@@ -1,5 +1,5 @@
 <?php
-$host = 'mysql-db';
+$host = 'mysql-db'; 
 $db   = getenv('MYSQL_DATABASE');
 $user = getenv('MYSQL_USER');
 $pass = getenv('MYSQL_PASSWORD');
@@ -13,7 +13,6 @@ $options = [
 
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
-    
     $products = $pdo->query("SELECT * FROM products")->fetchAll();
 } catch (\PDOException $e) {
     die("<h1>Ошибка подключения к базе данных:</h1> " . $e->getMessage());
@@ -25,24 +24,16 @@ try {
 <head>
     <meta charset="UTF-8">
     <title>Demo Shop</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 40px; }
-        .shop-title { color: #333; text-align: center; }
-        .product-container { display: flex; gap: 20px; justify-content: center; margin-top: 30px; }
-        .product-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 250px; text-align: center; }
-        .product-image { width: 100%; height: 150px; background: #ddd; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; margin-bottom: 15px; }
-        .product-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .price { color: #2ecc71; font-weight: bold; font-size: 18px; margin: 10px 0; }
-        .btn { background: #3498db; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
-    </style>
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-    <h1 class="shop-title">📦 Интернет-Каталог работает!</h1>
+    <h1 class="shop-title">📦 Интернет-Магазин работает!</h1>
+    <p class="shop-subtitle">Статика отдает Nginx, данные — MySQL, изображения — MinIO S3.</p>
 
     <div class="product-container">
         <?php if (empty($products)): ?>
-            <p>В каталоге пока нет товаров.</p>
+            <p>В каталоге пока нет товаров. Проверьте инициализацию базы.</p>
         <?php else: ?>
             <?php foreach ($products as $product): ?>
                 <div class="product-card">

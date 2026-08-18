@@ -1,6 +1,6 @@
 FROM php:8.2-fpm-alpine
 
-WORKDIR /var/www/html
+WORKDIR /var/www/html/
 
 RUN apk add --no-cache curl git zip
 
