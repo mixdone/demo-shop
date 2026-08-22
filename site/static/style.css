@@ -1,3 +1,4 @@
+/* Общие настройки стиля платформы */
 body { 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     background: #f8f9fa; 
@@ -14,6 +15,8 @@ body {
     color: #7f8c8d;
     margin-bottom: 30px;
 }
+
+/* Компоненты каталога товаров */
 .product-container { 
     display: flex; 
     gap: 25px; 
@@ -54,6 +57,8 @@ body {
     font-size: 20px; 
     margin: 12px 0; 
 }
+
+/* Кнопки и интерактивные элементы */
 .btn { 
     background: #3498db; 
     color: white; 
@@ -63,7 +68,54 @@ body {
     cursor: pointer; 
     font-weight: bold;
     width: 100%;
+    box-sizing: border-box;
 }
 .btn:hover {
     background: #2980b9;
+}
+
+/* Компоненты авторизации и админки (Формы) */
+.auth-card, .form-card { 
+    background: white; 
+    padding: 30px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+    max-width: 350px; 
+    margin: 60px auto 0; 
+}
+.form-group { 
+    margin-bottom: 15px; 
+    text-align: left; 
+}
+.form-group label { 
+    display: block; 
+    margin-bottom: 5px; 
+    font-weight: bold; 
+    color: #2c3e50; 
+}
+.form-group input { 
+    width: 100%; 
+    padding: 10px; 
+    box-sizing: border-box; 
+    border: 1px solid #ccc; 
+    border-radius: 6px; 
+}
+.error-msg { 
+    color: #e74c3c; 
+    margin-bottom: 15px; 
+    font-weight: bold; 
+    text-align: center; 
+}
+.success-msg { 
+    color: #2ecc71; 
+    margin-bottom: 15px; 
+    font-weight: bold; 
+    text-align: center; 
+}
+.switch-link { 
+    text-align: center; 
+    margin-top: 15px; 
+    display: block; 
+    color: #3498db; 
+    text-decoration: none; 
 }

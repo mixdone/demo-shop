@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS products (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO products (name, price, image_url) VAlUES
-('Apple', 10, 'http://localhost:9000/shop-products/apple.jpg'),
-('Orange', 11, 'http://localhost:9000/shop-products/orange.jpg');
+('Apple', 10, '/apple.jpg'),
+('Orange', 11, '/orange.jpg');
