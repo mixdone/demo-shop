@@ -1,0 +1,15 @@
+FROM php:8.2-cli-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache librdkafka-dev \
+    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+    && pecl install rdkafka \
+    && docker-php-ext-enable rdkafka \
+    && docker-php-ext-install pdo_mysql \
+    && docker-php-ext-install pcntl \
+    && apk del .build-deps
+
+COPY site/consumer/consumer.php /app/consumer.php
+
+CMD ["php", "/app/consumer.php"]
