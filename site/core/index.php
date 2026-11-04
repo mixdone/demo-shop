@@ -1,9 +1,7 @@
 <?php
-require '/var/www/html/vendor/autoload.php';
-
 session_start();
 
-$host = 'mysql-db'; 
+$host = 'mysql-db';
 $db   = getenv('MYSQL_DATABASE');
 $user = getenv('MYSQL_USER');
 $pass = getenv('MYSQL_PASSWORD');
@@ -30,19 +28,33 @@ try {
         ]);
 
         $conf = new RdKafka\Conf();
-        $conf->set('metadata.broker.list', 'kafka-broker:9092'); 
-
+        $conf->set('metadata.broker.list', 'kafka-broker:9092');
         $conf->set('enable.idempotence', 'true');
+        $conf->set('acks', 'all');
+        $conf->set('message.timeout.ms', '5000');
+
+        $delivered = false;
+        $conf->setDrMsgCb(function ($kafka, $message) use (&$delivered) {
+            if ($message->err) {
+                error_log("Kafka delivery failed: " . $message->errstr());
+            } else {
+                $delivered = true;
+            }
+        });
 
         $producer = new RdKafka\Producer($conf);
         $topic = $producer->newTopic("new-orders");
-
         $topic->produce(RD_KAFKA_PARTITION_UA, 0, $orderPayload);
-        
-        $producer->flush(1000); 
-        
-        $_SESSION['flash_message'] = "🚀 Заказ мгновенно оформлен";
+        $producer->flush(5000);
+
+        if ($delivered) {
+            $_SESSION['flash_message'] = "🚀 Заказ успешно отправлен в обработку";
+        } else {
+            $_SESSION['flash_message'] = "⚠️ Не удалось отправить заказ, попробуйте позже";
+        }
+
         header("Location: /index");
+        exit;
     }
 
     $cartCount = 0;
@@ -68,13 +80,12 @@ try {
 </head>
 <body>
 
-    <!-- Шапка платформы -->
     <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 40px; margin:-40px -40px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
         <h2 style="margin:0; color:#2c3e50;">📦 DevOps Shop <span style="font-size:12px; color:#9b59b6; vertical-align:super;">Asynchronous Inside</span></h2>
         <div style="font-size: 15px;">
             <?php if (isset($_SESSION['username'])): ?>
-                Привет, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>! 
-                (Успешных заказов в БД: <span style="color:#27ae60; font-weight:bold;"><?= $cartCount ?></span>) | 
+                Привет, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>!
+                (Успешных заказов в БД: <span style="color:#27ae60; font-weight:bold;"><?= $cartCount ?></span>) |
                 <a href="/admin" style="color:#3498db; font-weight:bold; text-decoration:none; margin-right:10px;">Админка</a> |
                 <a href="/logout" style="color:#e74c3c; text-decoration:none;">Выйти</a>
             <?php else: ?>
@@ -83,8 +94,11 @@ try {
         </div>
     </div>
 
-    <?php if (isset($msg)): ?>
-        <div class="success-msg" style="max-width: 550px; margin: 0 auto 20px; background:#f5eef8; border:1px solid #9b59b6; padding:15px; border-radius:8px; color:#8e44ad;"><?= $msg ?></div>
+    <?php if (!empty($_SESSION['flash_message'])): ?>
+        <div class="success-msg" style="max-width: 550px; margin: 0 auto 20px; background:#f5eef8; border:1px solid #9b59b6; padding:15px; border-radius:8px; color:#8e44ad;">
+            <?= htmlspecialchars($_SESSION['flash_message']) ?>
+        </div>
+        <?php unset($_SESSION['flash_message']); ?>
     <?php endif; ?>
 
     <h1 class="shop-title">📦 Витрина</h1>
@@ -97,7 +111,7 @@ try {
                 </div>
                 <h3><?= htmlspecialchars($product['name']) ?></h3>
                 <div class="price">$<?= htmlspecialchars($product['price']) ?></div>
-                
+
                 <form action="/index" method="POST">
                     <input type="hidden" name="buy_product_id" value="<?= $product['id'] ?>">
                     <button type="submit" class="btn" style="background:#9b59b6;">Купить</button>

@@ -10,7 +10,8 @@ RUN apk add --no-cache curl git zip librdkafka-dev \
     && apk del .build-deps
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
- 
-RUN composer require aws/aws-sdk-php -n --no-scripts
+
+COPY composer.json composer.lock* ./
+RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist
 
 EXPOSE 9000

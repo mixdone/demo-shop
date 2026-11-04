@@ -2,7 +2,7 @@
 session_start();
 
 if (isset($_SESSION['user_id'])) {
-    header("Location: /index.php");
+    header("Location: /index");
     exit;
 }
 
@@ -18,23 +18,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $db   = getenv('MYSQL_DATABASE');
         $user = getenv('MYSQL_USER');
         $pass = getenv('MYSQL_PASSWORD');
-        
+
         try {
             $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
             ]);
 
-            // Проверяем, не занят ли логин
             $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ?");
             $stmt->execute([$username]);
             if ($stmt->fetch()) {
                 $error = 'Этот логин уже занят';
             } else {
-                // ХЭШИРУЕМ ПАРОЛЬ (DevOps-стандарт безопасности)
                 $hash = password_hash($password, PASSWORD_BCRYPT);
 
-                // Записываем пользователя в твою новую таблицу users
                 $stmt = $pdo->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
                 $stmt->execute([$username, $hash]);
 
@@ -60,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="auth-card">
         <h2 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">📝 Регистрация</h2>
-        
+
         <?php if (!empty($error)): ?>
             <div class="error-msg"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
