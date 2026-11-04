@@ -67,6 +67,8 @@ cp .env.example .env
 
 # задайте свои секреты в .env
 
+docker run --rm httpd:2.4-alpine htpasswd -nbB ADMIN_NAME 'ADMIN_PASSWORD' > .htpasswd  
+
 docker compose up -d 
 
 ```
