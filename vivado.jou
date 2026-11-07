@@ -1,0 +1,150 @@
+#-----------------------------------------------------------
+# Vivado v2023.2 (64-bit)
+# SW Build 4029153 on Fri Oct 13 20:13:54 MDT 2023
+# IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+# SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+# Start of session at: Fri Nov  6 18:58:09 2026
+# Process ID: 1164069
+# Current directory: /home/mixdone/Desktop/demo-shop
+# Command line: vivado
+# Log file: /home/mixdone/Desktop/demo-shop/vivado.log
+# Journal file: /home/mixdone/Desktop/demo-shop/vivado.jou
+# Running On: mixdone-klvlwxxw, OS: Linux, CPU Frequency: 1397.282 MHz, CPU Physical cores: 12, Host memory: 16080 MB
+#-----------------------------------------------------------
+start_gui
+open_project /home/mixdone/Desktop/divisor/divisor.xpr
+update_compile_order -fileset sources_1
+launch_simulation
+source TB_divisor.tcl
+open_project /home/mixdone/Desktop/counter/counter.xpr
+update_compile_order -fileset sources_1
+close_project
+close_sim
+launch_simulation
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+run 10 us
+run 10 us
+run 10 us
+run 10 us
+run 10 us
+run 10 us
+run 10 us
+run 10 us
+run 10 us
+run 10 us
+run 10 us
+synth_design -rtl -rtl_skip_mlo -name rtl_1
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+synth_design -rtl -rtl_skip_mlo -name rtl_1
+refresh_design
+close_sim
+launch_simulation
+launch_simulation
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+launch_simulation
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+refresh_design
+refresh_design
+refresh_design
+refresh_design
+refresh_design
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+launch_simulation
+source TB_divisor.tcl
+close_sim
+close_project
+open_project /home/mixdone/Desktop/board_cnt/board_cnt.xpr
+update_compile_order -fileset sources_1
+reset_run synth_1
+launch_runs synth_1 -jobs 10
+wait_on_run synth_1
+open_run synth_1 -name synth_1
+launch_runs impl_1 -jobs 10
+wait_on_run impl_1
+close_design
+open_run impl_1
+synth_design -rtl -rtl_skip_mlo -name rtl_1
+set_property IOSTANDARD LVCMOS33 [get_ports [list com_ul1]]
+set_property IOSTANDARD LVCMOS33 [get_ports [list com_ul2]]
+save_constraints
+reset_run synth_1
+launch_runs synth_1 -jobs 10
+wait_on_run synth_1
+launch_runs impl_1 -jobs 10
+wait_on_run impl_1
+launch_runs impl_1 -to_step write_bitstream -jobs 10
+wait_on_run impl_1

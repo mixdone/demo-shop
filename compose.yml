@@ -39,6 +39,8 @@ services:
       MYSQL_DATABASE: "${MYSQL_DATABASE}"
       MYSQL_USER: "${MYSQL_USER}"
       MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      MYSQL_EXPORTER_USER: "${MYSQL_EXPORTER_USER}" 
+      MYSQL_EXPORTER_PASSWORD: "${MYSQL_EXPORTER_PASSWORD}"
     ports:
       - "3306:3306"
     volumes:
@@ -172,6 +174,36 @@ services:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - '--path.rootfs=/rootfs'
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro 
+      - /dev/disk/:/dev/disk:ro
+    privileged: true
+    command:
+      - '--docker_only=true'
+      - '--housekeeping_interval=30s'  
+      - '--allow_dynamic_housekeeping=true'
+      - '--enable_metrics=cpu,memory,network'
+      - '--disable_metrics=disk,diskIO,process,tcp,udp,percpu,sched,hugetlb,memory_numa,referenced_memory,resctrl,cpuset,advtcp'
+      - '--store_container_labels=false'
+  
+  mysqld-exporter:
+    image: prom/mysqld-exporter:v0.20.0
+    restart: unless-stopped
+    environment:
+      MYSQLD_EXPORTER_PASSWORD: "${MYSQL_EXPORTER_PASSWORD}"    
+    command:
+      - '--mysqld.address=mysql-db:3306'
+      - "--mysqld.username=${MYSQL_EXPORTER_USER}"  
+    depends_on:
+      mysql-db: 
+        condition: service_healthy
 
   grafana:
     image: grafana/grafana:13.3.0
